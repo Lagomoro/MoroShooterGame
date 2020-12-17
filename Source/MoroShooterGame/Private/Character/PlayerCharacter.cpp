@@ -2,16 +2,13 @@
 
 
 #include "Character/PlayerCharacter.h"
-
 #include "Components/CapsuleComponent.h"
-
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GeneratedCodeHelpers.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "Weapon/PickableWeapon.h"
 
 // Sets default values
