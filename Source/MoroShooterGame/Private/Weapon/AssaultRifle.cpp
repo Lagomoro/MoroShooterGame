@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapon/SniperRifle.h"
+#include "Weapon/AssaultRifle.h"
 #include "GameFramework/Character.h"
 #include "GeneratedCodeHelpers.h"
 #include "Kismet/GameplayStatics.h"
 
 // This event is executed on server.
-void ASniperRifle::OnFire_Implementation()
+void AAssaultRifle::OnFire_Implementation()
 {
 	Super::OnFire_Implementation();
 	//UE_LOG(LogTemp, Warning, TEXT("OnFire_Implementation"));
@@ -32,7 +32,7 @@ void ASniperRifle::OnFire_Implementation()
 				const FName HitBone = HitResult.BoneName;
 				MakeHitEffectOnAll(HitResult.PhysMaterial.Get(), HitResult.Location,
 					HitActor, HitComponent, HitBone);
-
+				
 				// Apply impulse on server
 				// This has been changed from the original blue print version, because all the object's movements
 				// has been replicated RELIABLE to all, therefore there is no need for replicating impulse
@@ -84,11 +84,46 @@ void ASniperRifle::OnFire_Implementation()
 }
 
 /*
-void ASniperRifle::SetFireDirectionByCameraParameters(const FVector CameraLocation, const FRotator CameraRotation)
+void AAssaultRifle::SetFireDirectionByCameraParameters(const FVector CameraLocation, const FRotator CameraRotation)
 {
 	if (!CalculateFireDirectionByLineTrace(CameraLocation, CameraRotation, ShootingRange))
 	{
 		CalculateFireDirectionByAdjustmentAlgorithm(CameraLocation, CameraRotation);
 	}
+}
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+bool AWeaponBase::CalculateFireDirectionByLineTrace(const FVector CameraLocation, const FRotator CameraRotation, float TraceRange)
+{
+	const FVector CameraDirection = CameraRotation.RotateVector(FVector::ForwardVector).GetSafeNormal();
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		FHitResult HitResult;
+		if (World->LineTraceSingleByChannel(HitResult, CameraLocation + CameraDirection,
+			CameraLocation + CameraDirection * TraceRange, ECC_Visibility,
+			FCollisionQueryParams(FName(), true, this)))
+		{
+			SetFireRotation((HitResult.Location - GetGunPortLocation()).Rotation());
+			return true;
+		}
+	}
+	return false;
+}
+
+void AWeaponBase::CalculateFireDirectionByAdjustmentAlgorithm(const FVector CameraLocation, const FRotator CameraRotation)
+{
+	SetFireRotation((CameraRotation.RotateVector(FVector::ForwardVector).GetSafeNormal() * 1000 +
+		CameraLocation - GetGunPortLocation()).Rotation());
 }
 */
