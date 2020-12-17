@@ -74,6 +74,9 @@ void AMoroShooterGameCharacter::SetupPlayerInputComponent(class UInputComponent*
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMoroShooterGameCharacter::OnResetVR);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMoroShooterGameCharacter::OnFireStart);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AMoroShooterGameCharacter::OnFireEnd);
 }
 
 
@@ -82,14 +85,24 @@ void AMoroShooterGameCharacter::OnResetVR()
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
+void AMoroShooterGameCharacter::OnFireStart()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Hello! UE4");
+}
+
+void AMoroShooterGameCharacter::OnFireEnd()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Hello! UE4");
+}
+
 void AMoroShooterGameCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AMoroShooterGameCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void AMoroShooterGameCharacter::TurnAtRate(float Rate)
