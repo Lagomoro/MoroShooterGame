@@ -45,12 +45,17 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(APlayerCharacter, AimPitch);
-	DOREPLIFETIME(APlayerCharacter, AimYaw);
 	DOREPLIFETIME(APlayerCharacter, MaxHealth);
 	DOREPLIFETIME(APlayerCharacter, Health);
 	DOREPLIFETIME(APlayerCharacter, bDead);
 	DOREPLIFETIME(APlayerCharacter, WeaponInHand);
+
+	DOREPLIFETIME(APlayerCharacter, AimPitch);
+	DOREPLIFETIME(APlayerCharacter, AimYaw);
+	DOREPLIFETIME(APlayerCharacter, bJumpButtonDown);
+	DOREPLIFETIME(APlayerCharacter, bFireButtonDown);
+	DOREPLIFETIME(APlayerCharacter, bAimButtonDown);
+	DOREPLIFETIME(APlayerCharacter, bCrouchButtonDown);
 }
 
 // Called when the game starts or when spawned
@@ -85,8 +90,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::OnJumpStart);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::OnJumpEnd);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
@@ -111,12 +116,28 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &APlayerCharacter::OnPickup);
 	PlayerInputComponent->BindAction("Drop", IE_Pressed, this, &APlayerCharacter::OnDrop);
+	
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::OnAimStart);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::OnAimEnd);
+	
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::OnCrouch);
 
 	// PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::);
 	// PlayerInputComponent->BindAction("OpenInGameMenu", IE_Pressed, this, &APlayerCharacter::);
-	// PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::);
-	// PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::);
+	
 	// PlayerInputComponent->BindAction("FreeView", IE_Pressed, this, &APlayerCharacter::);
+}
+
+void APlayerCharacter::OnJumpStart()
+{
+	HandleAction_Jump_StartOnServer();
+	Jump();
+}
+
+void APlayerCharacter::OnJumpEnd()
+{
+	HandleAction_Jump_StopOnServer();
+	StopJumping();
 }
 
 void APlayerCharacter::MoveForward(const float AxisValue)
@@ -176,6 +197,21 @@ void APlayerCharacter::OnDrop()
 	HandleDropOnServer();
 }
 
+void APlayerCharacter::OnAimStart()
+{
+	HandleAction_Aim_StartOnServer();
+}
+
+void APlayerCharacter::OnAimEnd()
+{
+	HandleAction_Aim_StopOnServer();
+}
+
+void APlayerCharacter::OnCrouch()
+{
+	HandleAction_Crouch_OnServer();
+}
+
 bool APlayerCharacter::IsAttacking()
 {
 	if (IsValid(WeaponInHand))
@@ -183,6 +219,11 @@ bool APlayerCharacter::IsAttacking()
 		return WeaponInHand->IsFiring();
 	}
 	return IsAttackingWithNoWeaponInHand_BP();
+}
+
+bool APlayerCharacter::IsHandFighting()
+{
+	return !IsValid(WeaponInHand) && bFireButtonDown;
 }
 
 float APlayerCharacter::AddHealth(const float HealthToAdd)
@@ -291,22 +332,6 @@ void APlayerCharacter::HandleAction_PickupOnServer_Implementation()
 	PickupFunctionModule->PickupFirstItem();
 }
 
-void APlayerCharacter::HandleAction_Fire_StopOnServer_Implementation()
-{
-	if (IsValid(WeaponInHand))
-	{
-		WeaponInHand->ActionStopFire();
-	}
-}
-
-void APlayerCharacter::HandleAction_Fire_StartOnServer_Implementation()
-{
-	if (IsValid(WeaponInHand))
-	{
-		WeaponInHand->ActionFire();
-	}
-}
-
 void APlayerCharacter::CallItemInterfaceFunctionOnAll_Implementation(const bool Pickup, AActor* ItemForAction)
 {
 	IPickableItem* ActionItem = Cast<IPickableItem>(ItemForAction);
@@ -363,3 +388,48 @@ void APlayerCharacter::HandlePickupOnServer_Implementation(AActor* ItemToPickup)
 	UE_LOG(LogTemp, Warning, TEXT("Attach BroadCast Over"));
 }
 
+void APlayerCharacter::HandleAction_Fire_StartOnServer_Implementation()
+{
+	bFireButtonDown = true;
+	if (IsValid(WeaponInHand))
+	{
+		WeaponInHand->ActionFire();
+	}
+}
+
+void APlayerCharacter::HandleAction_Fire_StopOnServer_Implementation()
+{
+	bFireButtonDown = false;
+	if (IsValid(WeaponInHand))
+	{
+		WeaponInHand->ActionStopFire();
+	}
+}
+
+void APlayerCharacter::HandleAction_Jump_StartOnServer_Implementation()
+{
+	bJumpButtonDown = true;
+}
+
+void APlayerCharacter::HandleAction_Jump_StopOnServer_Implementation()
+{
+	bJumpButtonDown = false;
+}
+
+void APlayerCharacter::HandleAction_Aim_StartOnServer_Implementation()
+{
+	bAimButtonDown = true;
+	MovementInputFactor = (bAimButtonDown || bCrouchButtonDown) ? 0.4 : 1;
+}
+
+void APlayerCharacter::HandleAction_Aim_StopOnServer_Implementation()
+{
+	bAimButtonDown = false;
+	MovementInputFactor = (bAimButtonDown || bCrouchButtonDown) ? 0.4 : 1;
+}
+
+void APlayerCharacter::HandleAction_Crouch_OnServer_Implementation()
+{
+	bCrouchButtonDown = !bCrouchButtonDown;
+	MovementInputFactor = (bAimButtonDown || bCrouchButtonDown) ? 0.4 : 1;
+}

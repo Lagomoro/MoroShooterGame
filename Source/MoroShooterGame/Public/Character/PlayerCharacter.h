@@ -53,18 +53,26 @@ public:
 	// * Status£º
 	//     PlayerCharacter Status
 	//-------------------------------------------------------------------------------- 
-	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status|View")
-		float AimPitch;
-	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status|View")
-		float AimYaw;
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
 		float Health;
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
 		bool bDead;
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
 		AWeaponBase* WeaponInHand;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Status")
-		bool JumpButtonDown;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status|View")
+		float AimPitch;
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status|View")
+		float AimYaw;
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
+		bool bJumpButtonDown;
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
+		bool bFireButtonDown;
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
+		bool bAimButtonDown;
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = "Status")
+		bool bCrouchButtonDown;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Status")
 		bool bFreeView;
 	//================================================================================
@@ -82,6 +90,11 @@ public:
 	// * Inputs£º
 	//     PlayerCharacter Inputs
 	//-------------------------------------------------------------------------------- 
+	UFUNCTION(BlueprintCallable, Category = "Inputs")
+		virtual void OnJumpStart();
+	UFUNCTION(BlueprintCallable, Category = "Inputs")
+		virtual void OnJumpEnd();
+
 	UFUNCTION(BlueprintCallable, Category = "Inputs")
 		virtual void MoveForward(const float AxisValue);
 	UFUNCTION(BlueprintCallable, Category = "Inputs")
@@ -106,6 +119,14 @@ public:
 		virtual void OnPickup();
 	UFUNCTION(BlueprintCallable, Category = "Inputs")
 		virtual void OnDrop();
+
+	UFUNCTION(BlueprintCallable, Category = "Inputs")
+		virtual void OnAimStart();
+	UFUNCTION(BlueprintCallable, Category = "Inputs")
+		virtual void OnAimEnd();
+
+	UFUNCTION(BlueprintCallable, Category = "Inputs")
+		virtual void OnCrouch();
 	//================================================================================
 
 	//================================================================================
@@ -114,6 +135,8 @@ public:
 	//-------------------------------------------------------------------------------- 
 	UFUNCTION(BlueprintCallable, Category = Status)
 		bool IsAttacking();
+	UFUNCTION(BlueprintCallable, Category = Status)
+		bool IsHandFighting();
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Status)
 		bool IsAttackingWithNoWeaponInHand_BP();
 	UFUNCTION(BlueprintCallable, Category = Status)
@@ -144,6 +167,16 @@ public:
 		void HandleAction_Fire_StopOnServer();
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Process")
 		void HandleAction_PickupOnServer();
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Process")
+		void HandleAction_Jump_StartOnServer();
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Process")
+		void HandleAction_Jump_StopOnServer();
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Process")
+		void HandleAction_Aim_StartOnServer();
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Process")
+		void HandleAction_Aim_StopOnServer();
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Process")
+		void HandleAction_Crouch_OnServer();
 	//================================================================================
 
 	//================================================================================
