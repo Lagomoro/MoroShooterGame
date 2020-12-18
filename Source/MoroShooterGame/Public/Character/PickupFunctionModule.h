@@ -16,24 +16,15 @@ class MOROSHOOTERGAME_API UPickupFunctionModule : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UPickupFunctionModule();
 
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	// This TMap actually integrated both TArray[PickableItems] and TMap[Display Items].
-	// Now it has both functions.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Status)
 	TMap<AActor*, UUserWidget*> PickableWidgets;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Status)
 	TArray<AActor*> PickableItems;
 
-	// Sometimes, when a player loads in a level with a weapon on his side,
-	// the system will execute the Overlap event first, causing the list to be empty.
-	// We will scan all the objects surrounds, so that no object will be missed.
-	// This array should be useless after game start.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Status)
 	bool bShouldScanPickable = true;
 
@@ -50,7 +41,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Settings)
 	FOnPickupItemDelegate OnPickupItemEvent;
 	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category=Actions)

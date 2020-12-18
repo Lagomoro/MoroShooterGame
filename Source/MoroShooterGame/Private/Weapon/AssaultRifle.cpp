@@ -75,29 +75,3 @@ void AAssaultRifle::OnFire_Implementation()
 	}
 }
 
-
-/*
-bool AWeaponBase::CalculateFireDirectionByLineTrace(const FVector CameraLocation, const FRotator CameraRotation, float TraceRange)
-{
-	const FVector CameraDirection = CameraRotation.RotateVector(FVector::ForwardVector).GetSafeNormal();
-	UWorld* World = GetWorld();
-	if (IsValid(World))
-	{
-		FHitResult HitResult;
-		if (World->LineTraceSingleByChannel(HitResult, CameraLocation + CameraDirection,
-			CameraLocation + CameraDirection * TraceRange, ECC_Visibility,
-			FCollisionQueryParams(FName(), true, this)))
-		{
-			SetFireRotation((HitResult.Location - GetGunPortLocation()).Rotation());
-			return true;
-		}
-	}
-	return false;
-}
-
-void AWeaponBase::CalculateFireDirectionByAdjustmentAlgorithm(const FVector CameraLocation, const FRotator CameraRotation)
-{
-	SetFireRotation((CameraRotation.RotateVector(FVector::ForwardVector).GetSafeNormal() * 1000 +
-		CameraLocation - GetGunPortLocation()).Rotation());
-}
-*/

@@ -11,11 +11,7 @@
 // Sets default values for this component's properties
 UPickupFunctionModule::UPickupFunctionModule()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 // Called when the game starts
@@ -41,11 +37,6 @@ void UPickupFunctionModule::BeginPlay()
 				"standard interface (IPickableInfoWidget), information might be incomplete on widget!"));
 		}
 	}
-	// if (!IsValid(DisplayBox))
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("The Pickable display box is invalid, pickable info will be incomplete. Please "
-	// 		"configure the PickupFunctionModule->DisplayBox in your character BP properly!"));
-	// }
 }
 
 // Called every frame
@@ -71,10 +62,6 @@ bool UPickupFunctionModule::AddItemToList(AActor* ItemAbleToPickup)
 {
 	PickableItems.AddUnique(ItemAbleToPickup);
 	UE_LOG(LogTemp, Warning, TEXT("PickUp"));
-	/*if (!IsValid(DisplayBox) || !IsValid(PickableDisplayLabelClass))
-	{
-		return false;
-	}*/
 	if (PickableItems.AddUnique(ItemAbleToPickup) != INDEX_NONE)
 	{
 		AController* OwnerController = GetOwner()->GetInstigatorController();
@@ -82,16 +69,6 @@ bool UPickupFunctionModule::AddItemToList(AActor* ItemAbleToPickup)
 		{
 			return true;
 		}
-		/*UUserWidget* SubWidget = CreateWidget(Cast<APlayerController>(OwnerController), PickableDisplayLabelClass);
-		if (IsValid(PickableDisplayLabelClass) && bDisplayLabelClassProperlySetup)
-		{
-			// Configure the display data for created widget if it has implemented the standard interface.
-			Cast<IPickableInfoWidget>(SubWidget)->Execute_ApplyPickableInfo(SubWidget,
-				Cast<IPickableItem>(ItemAbleToPickup)->Execute_GetPickableInfo(ItemAbleToPickup));
-		}
-		PickableWidgets.Add(ItemAbleToPickup, SubWidget);
-		DisplayBox->AddChildToVerticalBox(SubWidget)->SetPadding(FMargin(0, 0, 0, 20));
-		return true;*/
 	}
 	return false;
 }
@@ -99,11 +76,6 @@ bool UPickupFunctionModule::AddItemToList(AActor* ItemAbleToPickup)
 bool UPickupFunctionModule::RemoveItemFromList(AActor* ItemLostTrack)
 {
 	PickableItems.Remove(ItemLostTrack);
-	/*if (!IsValid(DisplayBox) || !IsValid(PickableDisplayLabelClass))
-	{
-		// To prevent the Display box becomes invalid afterwards.
-		return PickableItems.Remove(ItemLostTrack) > 0;
-	}*/
 	if (PickableItems.Remove(ItemLostTrack) > 0)
 	{
 		AController* OwnerController = GetOwner()->GetInstigatorController();
@@ -111,9 +83,6 @@ bool UPickupFunctionModule::RemoveItemFromList(AActor* ItemLostTrack)
 		{
 			return true;
 		}
-		/*DisplayBox->RemoveChild(PickableWidgets[ItemLostTrack]);
-		PickableWidgets.Remove(ItemLostTrack);
-		return true;*/
 	}
 	return false;
 }
