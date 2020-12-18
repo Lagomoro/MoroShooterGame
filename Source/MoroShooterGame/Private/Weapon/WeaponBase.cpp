@@ -18,7 +18,8 @@ AWeaponBase::AWeaponBase()
 	RootComponent = WeaponBody;
 	WeaponFireArrow->SetupAttachment(RootComponent);
 
-	WeaponBody->SetMassOverrideInKg(NAME_None, MassInKg);
+	WeaponBody->BodyInstance.bOverrideMass = true;
+	WeaponBody->BodyInstance.SetMassOverride(MassInKg);
 
 	BulletRemain = MaxBulletCapacity;
 }

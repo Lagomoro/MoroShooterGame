@@ -26,7 +26,8 @@ APlayerCharacter::APlayerCharacter()
 
 	CameraBoom->bUsePawnControlRotation = true;
 
-	GetCapsuleComponent()->SetMassOverrideInKg(NAME_None, 75.0);
+	GetCapsuleComponent()->BodyInstance.bOverrideMass = true;
+	GetCapsuleComponent()->BodyInstance.SetMassOverride(75.0f);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Block);

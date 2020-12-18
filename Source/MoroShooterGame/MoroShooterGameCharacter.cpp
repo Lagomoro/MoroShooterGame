@@ -87,12 +87,12 @@ void AMoroShooterGameCharacter::OnResetVR()
 
 void AMoroShooterGameCharacter::OnFireStart()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Hello! UE4");
+	
 }
 
 void AMoroShooterGameCharacter::OnFireEnd()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Hello! UE4");
+	
 }
 
 void AMoroShooterGameCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
