@@ -10,7 +10,6 @@
 void ASniperRifle::OnFire_Implementation()
 {
 	Super::OnFire_Implementation();
-	//UE_LOG(LogTemp, Warning, TEXT("OnFire_Implementation"));
 	const float ActualUse = UseBullet(1);
 	MakeFireEffectOnAll(ActualUse > 0);
 	UWorld* World = GetWorld();
@@ -20,7 +19,6 @@ void ASniperRifle::OnFire_Implementation()
 		{
 			FHitResult HitResult;
 			const FVector GunPortLocation = WeaponFireArrow->GetComponentLocation();
-			//const FVector AimingDirection = FireDirection.GetSafeNormal();
 			const FVector AimingDirection = WeaponFireArrow->GetForwardVector();
 			auto QueryParams = FCollisionQueryParams(FName(), true, this);
 			QueryParams.bReturnPhysicalMaterial = true;
@@ -34,9 +32,6 @@ void ASniperRifle::OnFire_Implementation()
 					HitActor, HitComponent, HitBone);
 
 				// Apply impulse on server
-				// This has been changed from the original blue print version, because all the object's movements
-				// has been replicated RELIABLE to all, therefore there is no need for replicating impulse
-				// to all clients.
 				if (HitComponent->IsSimulatingPhysics() && HitComponent->Mobility == EComponentMobility::Movable)
 				{
 					HitComponent->AddImpulseAtLocation(HitResult.Normal * BulletImpulse,
@@ -71,24 +66,11 @@ void ASniperRifle::OnFire_Implementation()
 				UGameplayStatics::ApplyDamage(HitActor, DamageToApply,
 					IsValid(WeaponOwner) ? WeaponOwner->GetInstigatorController() : nullptr,
 					this, UDamageType::StaticClass());
-				// Little question here: What is the difference between AActor::GetInstigatorController() and
-				// APawn::GetController() ? (F.Y.I: There is no GetController() here in C++ but have both in BP.)
 			}
 		}
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Actual_Use = 0"));
 		ActionStopFire();
 	}
 }
-
-/*
-void ASniperRifle::SetFireDirectionByCameraParameters(const FVector CameraLocation, const FRotator CameraRotation)
-{
-	if (!CalculateFireDirectionByLineTrace(CameraLocation, CameraRotation, ShootingRange))
-	{
-		CalculateFireDirectionByAdjustmentAlgorithm(CameraLocation, CameraRotation);
-	}
-}
-*/
